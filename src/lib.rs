@@ -13,20 +13,19 @@
  */
 use image::{imageops, DynamicImage, GenericImageView, Pixels, Rgba};
 
-
 ///
 /// ### asciify
-/// 
+///
 /// this method transform an Image into a string.
 /// img_scale is a Vec of chars representing the chars scale of brightness
 /// You can pass any scale you want to it
 /// (Example of img_scale: "@%#*+=-:. " if the background is white, else reverse this string)
-/// 
+///
 pub fn asciify(
     desired_width: u32,
     desired_height: u32,
-    img_scale: Vec<char>,
-    img: DynamicImage
+    img_scale: &Vec<char>,
+    img: &DynamicImage,
 ) -> Result<String, &'static str> {
     let (width, height) = img.dimensions();
     let chunk_width = width / desired_width;
@@ -34,7 +33,7 @@ pub fn asciify(
 
     // round up the image
     let resized_img: DynamicImage = DynamicImage::resize(
-        &img,
+        img,
         chunk_width * desired_width,
         chunk_height * desired_height,
         imageops::FilterType::Lanczos3,
@@ -53,10 +52,10 @@ pub fn asciify(
     let dim = resized_img.dimensions();
 
     match create_ascii_string(
-        desired_width,
-        desired_height,
+        &desired_width,
+        &desired_height,
         &gray_shades,
-        &img_scale,
+        img_scale,
         &chunk_width,
         &chunk_height,
         &dim,
@@ -67,8 +66,8 @@ pub fn asciify(
 }
 
 fn create_ascii_string(
-    desired_width: u32,
-    desired_height: u32,
+    desired_width: &u32,
+    desired_height: &u32,
     gray_shades: &Vec<u32>,
     img_scale: &Vec<char>,
     chunk_width: &u32,
@@ -76,8 +75,10 @@ fn create_ascii_string(
     (width, _height): &(u32, u32),
 ) -> Result<String, &'static str> {
     let mut ascii_string = String::new();
-    for line in 0..desired_height {
-        for column in 0..desired_width {
+    let d_width = desired_width.clone();
+    let d_height = desired_height.clone();
+    for line in 0..d_height {
+        for column in 0..d_width {
             let start_x: u32 = column * chunk_width;
             let start_y: u32 = line * chunk_height;
             let end_x: u32 = start_x + chunk_width;
@@ -147,4 +148,45 @@ fn calculate_associated_char(
     println!("shade ---> {}", chunk_shade);
 
     Err("Chunk shade number > 256!!!")
+}
+
+#[cfg(test)]
+mod tests {
+    use std::fs;
+
+    use image::open;
+
+    // Note this useful idiom: importing names from outer (for mod tests) scope.
+    use super::*;
+
+    #[test]
+    fn asciify_compare() {
+        let desired_width: u32 = 128;
+        let desired_height: u32 = 64;
+        let scale = *b"@%#*+=-:. ";
+
+        let img_scale: Vec<char> = String::from_utf8(Vec::from(scale))
+            .unwrap_or(String::new())
+            .chars()
+            .collect();
+
+        let img = open("src/res/monster.jpg").expect("Failed to open image at {file_path}");
+
+
+        let test_string = fs::read_to_string("src/res/test_string")
+            .expect("Should have been able to read the file");
+
+        let ascii_string = asciify(
+            desired_width,
+            desired_height,
+            &img_scale,
+            &img
+        )
+        .unwrap();
+
+        println!("{}", test_string.len());
+        println!("{}", ascii_string.len());
+
+        assert_eq!(ascii_string, test_string);
+    }
 }
