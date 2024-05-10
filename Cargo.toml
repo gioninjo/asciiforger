@@ -6,6 +6,8 @@ description = "Utilities for transforming images in an ascii string"
 license = "GPL-3.0-only"
 keywords = ["ascii", "jpg", "image", "png", "transform"]
 categories = ["multimedia::encoding", "multimedia::images", "multimedia"]
+exclude = ["/tests"]
+
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
