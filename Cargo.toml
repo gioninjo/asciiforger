@@ -13,3 +13,4 @@ exclude = ["/tests"]
 
 [dependencies]
 image = "0.25.1"
+ffmpeg-next = "7.0.0"

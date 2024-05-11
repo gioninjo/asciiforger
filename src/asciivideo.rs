@@ -11,8 +11,18 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+use std::time;
 
-pub mod images;
-pub mod video;
-pub mod asciivideo;
-pub mod videotoimage;
+///
+/// ### run_ascii_video
+/// 
+/// take an ascii vector and a time interval, then print the vector like a video on the output,
+/// with time_interval as the time between a frame and the other
+pub fn run_ascii_video(ascii_vec: Vec<String>, time_interval: f32) -> () {
+  for ascii_frame in ascii_vec {
+    println!("{}", ascii_frame);
+    let ten_millis = time::Duration::from_millis(time_interval as u64);
+    std::thread::sleep(ten_millis);
+    print!("{}[2J", 27 as char);
+  }
+}
