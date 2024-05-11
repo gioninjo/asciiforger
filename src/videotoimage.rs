@@ -1,3 +1,16 @@
+//  SPDX-License-Identifier: GPL-3.0-only
+/*  Build tool with support for git tags, wrapping make.
+ *  Copyright (C) 2024  gioninjo
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, version 3 of the License.
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 extern crate ffmpeg_next as ffmpeg;
 use ffmpeg::format::context::Input;
 use ffmpeg::format::{input, Pixel};
@@ -7,6 +20,13 @@ use ffmpeg::util::frame::video::Video;
 use ffmpeg::Rational;
 use image::*;
 
+
+
+///
+/// ### read_video_and_decode
+/// 
+/// Transform a video into a dynamic images vector
+/// 
 pub fn read_video_and_decode(path: &String) -> Result<(Vec<DynamicImage>, f32), ffmpeg::Error> {
     match input(path) {
       Ok(res) => {
@@ -46,6 +66,7 @@ pub fn read_video_and_decode(path: &String) -> Result<(Vec<DynamicImage>, f32), 
 
 fn get_img_from_frame(frame: &Video) -> Result<DynamicImage, ffmpeg::Error> {
 
+    // insert header bytes for image file
     let mut image_in_byte_vec = Vec::from(
         format!("P6\n{} {}\n255\n", frame.width(), frame.height())
             .as_bytes()
@@ -108,7 +129,6 @@ fn get_img_vec_from_video(
 
     Ok(images)
 }
-
 
 fn get_time_between_frames_millis(frame_rate: Rational) -> f32 {
     let fps: f32 = (frame_rate.numerator() as f32) / (frame_rate.denominator() as f32);
