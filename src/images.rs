@@ -39,6 +39,12 @@ pub fn asciify(
         imageops::FilterType::Lanczos3,
     );
 
+    println!("width  --> {}", resized_img.width());
+    println!("height  --> {}", resized_img.height());
+    println!("chunk_width  --> {}", chunk_width);
+    println!("chunk_height  --> {}", chunk_height);
+
+
     let pixels: Pixels<'_, DynamicImage> = resized_img.pixels();
 
     let mut gray_shades: Vec<u32> = vec![];

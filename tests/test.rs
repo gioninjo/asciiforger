@@ -66,3 +66,28 @@ fn video_decoding_test() {
     assert_eq!(video_string.len(), test_string.len());
     println!("o");
 }
+
+
+#[test]
+fn bug() {
+    let desired_width: u32 = 225;
+    let desired_height: u32 = 120;
+    let scale = *b"@%#*+=-:. ";
+
+    let img_scale: Vec<char> = String::from_utf8(Vec::from(scale))
+        .unwrap_or(String::new())
+        .chars()
+        .collect();
+
+    let img = open("/home/gioninjo/Downloads/ball.jpeg").expect("Failed to open image at {file_path}");
+
+    let test_string = fs::read_to_string("tests/res/test_string")
+        .expect("Should have been able to read the file");
+
+    let ascii_string = asciify(desired_width, desired_height, &img_scale, &img).unwrap();
+
+    println!("{}", ascii_string);
+
+    assert_eq!(true, true);
+}
+
