@@ -39,12 +39,6 @@ pub fn asciify(
         imageops::FilterType::Lanczos3,
     );
 
-    println!("width  --> {}", resized_img.width());
-    println!("height  --> {}", resized_img.height());
-    println!("chunk_width  --> {}", chunk_width);
-    println!("chunk_height  --> {}", chunk_height);
-
-
     let pixels: Pixels<'_, DynamicImage> = resized_img.pixels();
 
     let mut gray_shades: Vec<u32> = vec![];
@@ -57,9 +51,13 @@ pub fn asciify(
 
     let dim = resized_img.dimensions();
 
+
+    println!("width  --> {}", resized_img.width());
+    println!("height  --> {}", resized_img.height());
+    println!("chunk_width  --> {}", chunk_width);
+    println!("chunk_height  --> {}", chunk_height);
+
     match create_ascii_string(
-        &desired_width,
-        &desired_height,
         &gray_shades,
         img_scale,
         &chunk_width,
@@ -71,18 +69,20 @@ pub fn asciify(
     }
 }
 
-fn create_ascii_string(
-    desired_width: &u32,
-    desired_height: &u32,
+///
+/// ### create_ascii_string
+/// 
+/// This method takes an u32 vec and create an encoded ascii string using scale to convert it
+pub fn create_ascii_string(
     gray_shades: &Vec<u32>,
-    img_scale: &Vec<char>,
+    scale: &Vec<char>,
     chunk_width: &u32,
     chunk_height: &u32,
-    (width, _height): &(u32, u32),
+    (width, height): &(u32, u32),
 ) -> Result<String, &'static str> {
     let mut ascii_string = String::new();
-    let d_width = desired_width.clone();
-    let d_height = desired_height.clone();
+    let d_width = width.clone();
+    let d_height = height.clone();
     for line in 0..d_height {
         for column in 0..d_width {
             let start_x: u32 = column * chunk_width;
@@ -100,7 +100,7 @@ fn create_ascii_string(
                 start_y,
                 end_y,
             );
-            match calculate_associated_char(img_scale, chunk_shade) {
+            match calculate_associated_char(scale, chunk_shade) {
                 Ok(shade) => ascii_string.push(shade),
                 Err(e) => return Err(e),
             }
@@ -123,8 +123,8 @@ fn calculate_chunk_shade(
 ) -> u32 {
     let mut chunk_shades_sum: u32 = 0;
 
-    for pixel_y in start_y..end_y {
-        for pixel_x in start_x..end_x {
+    for pixel_y in start_y+1..=end_y {
+        for pixel_x in start_x+1..=end_x {
             let mut pixel_position = (pixel_y * width + pixel_x) as usize;
             if pixel_position >= gray_shades.len() {
                 pixel_position = gray_shades.len() - 1;
